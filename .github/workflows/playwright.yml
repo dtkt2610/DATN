@@ -21,7 +21,7 @@ jobs:
           dotnet-version: '9.0.203' # Hoặc phiên bản bạn dùng
 
       - name: Restore .NET dependencies
-        run: dotnet restore src/YourApp
+        run: dotnet restore WebShoeShop/WebShoeShop.csproj
 
       - name: Build .NET app
         run: dotnet build WebShoeShop/WebShoeShop.csproj --configuration Release
