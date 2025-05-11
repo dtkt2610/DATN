@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
- const HomepageURL = "https://localhost:44390/";
+ const HomepageURL = "http://localhost:44390/";
 
 test('getlogin', async({page})=>{
   await page.goto(HomepageURL);
