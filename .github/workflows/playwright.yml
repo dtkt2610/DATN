@@ -20,15 +20,7 @@ jobs:
         run: |
           choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Component.Web --add Microsoft.VisualStudio.ComponentGroup.Web --includeRecommended --includeOptional --passive --locale en-US"
 
-      # Verify if the required file exists
-      - name: Verify WebApplication.targets file
-        run: |
-          if (Test-Path "C:\Program Files\dotnet\sdk\9.0.203\Microsoft\VisualStudio\v17.0\WebApplications\Microsoft.WebApplication.targets") {
-            Write-Host "File exists."
-          } else {
-            Write-Host "File does not exist."
-            exit 1
-          }
+    
 
       # Setup .NET SDK
       - name: Setup .NET SDK
