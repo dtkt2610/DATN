@@ -14,11 +14,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Setup .NET SDK nếu là dự án .NET
+      # Cài Visual Studio Build Tools + Web targets (fix lỗi thiếu WebApplication.targets)
+      - name: Install Visual Studio Build Tools with Web targets
+        run: |
+          choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Component.Web --includeRecommended --includeOptional --passive --locale en-US"
+
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '9.0.203' # Hoặc phiên bản bạn dùng
+          dotnet-version: '9.0.203'
 
       - name: Restore .NET dependencies
         run: dotnet restore WebShoeShop/WebShoeShop.sln
@@ -45,7 +49,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
-        run: HOMEPAGEURL= https://localhost:44390/ npx playwright test
+        run: HOMEPAGEURL=https://localhost:44390/ npx playwright test
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
