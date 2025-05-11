@@ -21,13 +21,13 @@ jobs:
           dotnet-version: '9.0.203' # Hoặc phiên bản bạn dùng
 
       - name: Restore .NET dependencies
-        run: dotnet restore WebShoeShop/WebShoeShop.csproj
+        run: dotnet restore WebShoeShop/WebShoeShop.sln
 
       - name: Build .NET app
-        run: dotnet build WebShoeShop/WebShoeShop.csproj --configuration Release
+        run: dotnet build WebShoeShop/WebShoeShop.sln --configuration Release
 
       - name: Run web server
-        run: dotnet run --project WebShoeShop/WebShoeShop.csproj --urls https://localhost:44390/ &
+        run: dotnet run --project WebShoeShop/WebShoeShop.sln --urls https://localhost:44390/ &
         env:
           ASPNETCORE_ENVIRONMENT: Development
 
