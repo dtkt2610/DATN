@@ -1,0 +1,50 @@
+﻿@model WebShoeShop.Models.EF.Subscribe
+@using (Ajax.BeginForm("Subscribe", "Home", new AjaxOptions
+{
+    OnBegin = "OnBeginSub",
+    OnSuccess = "OnSuccessSub",
+    OnFailure = "OnFailureSub"
+}))
+{
+    @Html.AntiForgeryToken()
+    <script>
+        function OnBeginSub() {
+            // Vô hiệu hóa nút gửi khi form bắt đầu gửi
+            document.getElementById("newsletter_submit").disabled = true;
+        }
+
+        function OnSuccessSub(rs) {
+            if (rs.Success) {
+                alert("Đăng ký thành công");
+                // Thiết lập lại trường email và kích hoạt lại nút gửi
+                document.getElementById("letter_email").value = "";
+            } else {
+                alert("Đăng ký không thành công. Vui lòng thử lại.");
+            }
+            // Kích hoạt lại nút gửi
+            document.getElementById("newsletter_submit").disabled = false;
+        }
+
+        function OnFailureSub(rs) {
+            // Xử lý khi có lỗi xảy ra và hiển thị thông báo lỗi
+            alert("Có lỗi xảy ra. Vui lòng kiểm tra kết nối và thử lại.");
+            // Kích hoạt lại nút gửi trong trường hợp có lỗi
+            document.getElementById("newsletter_submit").disabled = false;
+        }
+    </script>
+
+    <div class="footer-widget">
+        <div class="footer-widget-heading">
+            <h3>Đăng ký</h3>
+        </div>
+        <div class="footer-text mb-25">
+            <p> Đừng bỏ lỡ việc đăng ký các sản phẩm và khuyến mãi mới của chúng tôi, vui lòng nhập liên hệ bên dưới.</p>
+        </div>
+        <div class="subscribe-form">
+            <form action="#">
+                <input id="letter_email" type="email" placeholder="Địa chỉ Email hoặc số điện thoại" name="Email" required="required" oninvalid="this.setCustomValidity('Vui lòng điền Email.')" oninput="this.setCustomValidity('')" data-error="Định dạng Email không hợp lệ.">
+                <button id="newsletter_submit" type="submit"><i class="fa-regular fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
+}

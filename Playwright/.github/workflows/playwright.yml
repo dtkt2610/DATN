@@ -1,0 +1,17 @@
+stages:
+  - test
+
+chau_tu:
+  stage: test
+  image: mcr.microsoft.com/playwright:v1.43.1-jammy  # Image đã có sẵn Playwright + Node.js
+  timeout: 60 minutes
+  script:
+    - npm ci  # Cài đặt các dependencies
+    - npx playwright install --with-deps  # Cài trình duyệt Playwright và các phụ thuộc
+    - npx playwright test  # Chạy test
+  artifacts:
+    when: always  # Luôn lưu báo cáo, kể cả khi job bị lỗi hoặc bị hủy
+    name: "playwright-report"
+    paths:
+      - playwright-report/  # Đường dẫn đến thư mục chứa báo cáo test
+    expire_in: 30 days  # Báo cáo sẽ bị xóa sau 30 ngày

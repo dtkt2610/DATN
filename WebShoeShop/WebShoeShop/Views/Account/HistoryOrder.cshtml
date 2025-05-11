@@ -1,0 +1,145 @@
+﻿﻿@model PagedList.IPagedList<WebShoeShop.Models.EF.Order>
+@using PagedList.Mvc;
+
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<link href="~/Content/HistoryOrder.css" rel="stylesheet" />
+<style>
+    .cancel-order {
+        margin-top: 5px;
+        padding: 5px 10px;
+        color: #fff;
+        background-color: #dc3545;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+        .cancel-order:hover {
+            background-color: #c82333;
+        }
+</style>
+@if (Model != null)
+{
+    var i = 1;
+    <div class="main-container">
+        <div class="current-balance">
+            <h2>Lịch sử mua hàng<span>......</span></h2>
+        </div>
+        <div class="content-container">
+            <table class="purchase-history">
+                <thead>
+                    <tr>
+                        <td>STT</td>
+                        <td>Mã đơn hàng</td>
+                        <td>Thông tin sản phẩm</td>
+                        <td>Địa chỉ nhận hàng</td>
+                        <td>Tổng tiền</td>
+                        <td>Trạng thái</td>
+                        <td>Thời gian đặt hàng</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            <td>@item.Code</td>
+                            <td>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <td>Tên sản phẩm</td>
+                                            <td>Hình ảnh</td>
+                                            <td>Số lượng</td>
+                                            <td>Size</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var orderDetail in item.OrderDetails)
+                                        {
+                                            var CheckImage = orderDetail.Product.ProductImage.FirstOrDefault(x => x.IsDefault);
+                                            var strImg = "";
+                                            if (CheckImage != null)
+                                            {
+                                                strImg = CheckImage.Image;
+                                            }
+                                            <tr>
+                                                <td>@orderDetail.Product.Title</td>
+                                                <td><img src="@strImg" data-id="@orderDetail.Id alt="Alternate Text" style="width:90px;height:90px;" /></td>
+                                                <td>@orderDetail.Quantity</td>
+
+                                                <td>@orderDetail.Size</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td>@item.Address</td>
+                            <td>@item.TotalAmount</td>
+
+                            <td>
+                                @switch (item.Status)
+                                {
+                                    case 1:
+                                        <span>Chưa duyệt</span>
+                                        <button class="btn btn-danger cancel-order" data-id="@item.Id">Hủy đơn</button>
+                                        break;
+                                    case 2:
+                                        <span>Đã duyệt</span>
+                                        break;
+                                    case 3:
+                                        <span>Đang giao</span>
+                                        break;
+                                    case 4:
+                                        <span>Hoàn thành</span>
+                                        break;
+                                    default:
+                                        <span>Đã hủy</span>
+                                        break;
+                                }
+                            </td>
+
+                            <td>@item.CreatedDate</td>
+                        </tr>
+                        i++;
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+}
+<a href=""></a>
+
+<div class="row">
+    <div class="col-6"></div>
+    <div class="col-6" style="text-align:right;">
+        @Html.PagedListPager(Model, page => Url.Action("Profile", new { page }))
+    </div>
+</div>
+
+<script>
+    $(document).on("click", ".cancel-order", function () {
+        const orderId = $(this).data("id");
+
+        if (confirm("Bạn có chắc muốn hủy đơn hàng này?")) {
+            $.ajax({
+                url: '/Account/CancelOrder',
+                type: 'POST',
+                data: { orderId: orderId },
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload(); 
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert("Đã xảy ra lỗi, vui lòng thử lại.");
+                }
+            });
+        }
+    });
+
+</script>

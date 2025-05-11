@@ -1,0 +1,311 @@
+﻿@using WebShoeShop.Common
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@SettingHelper.GetValue("SettingTitle")</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Double 2T-2Q Store">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="@SettingHelper.GetValue("SettingLogo")" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/bootstrap4/bootstrap.min.css">
+    <link href="~/Content/assets/plugins/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="~/Content/assets/plugins/OwlCarousel2-2.2.1/owl.carousel.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/assets/plugins/OwlCarousel2-2.2.1/owl.theme.default.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/assets/plugins/OwlCarousel2-2.2.1/animate.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/assets/plugins/jquery-ui-1.12.1.custom/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="description" content="@ViewBag.SeoDescription" />
+    <meta name="keywords" itemprop="keywords" content="@ViewBag.SeoKeyWord" />
+    <link href="~/Content/assets/styles/main.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/assets/styles/animate.css" rel="stylesheet" type="text/css" />
+    @*<meta name="news_keywords" content="@ViewBag.SeoKeyWord" />*@
+    <link rel="canonical" href="https://www.ten_mien_/" />
+    <meta name="robots" content="index,follow,noodp" />
+    <meta name="robots" content="noarchive">
+    <meta property="og:site_name" content="2T-2Q Sneaker" />
+    <meta property="og:type" content="Website" />
+    <meta property="og:locale" content="vi_VN" />
+    @*<meta property="fb:app_id" content="232505114857147" />*@
+    @*<meta property="fb:pages" content="1128104117285467" />*@
+    <meta property="og:title" itemprop="name" content="@ViewBag.Title" />
+    <meta property="og:url" itemprop="url" content="https://www.ten_mien/" />
+    <meta property="og:description" content="@ViewBag.SeoDescription" />
+    <!--script_breadcrum-->
+    @*@RenderSection("css", required: false)*@
+    <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css" rel="stylesheet" />
+    @*@Styles.Render("~/Content/css")*@
+    @Scripts.Render("~/bundles/modernizr")
+    <script src="~/Content/assets/js/jquery-3.2.1.min.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+
+</head>
+<body>
+    <div class="super_container">
+
+        <!-- Header -->
+
+        <header class="header trans_300">
+
+            <!-- Top Navigation -->
+            <div class="top_nav">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="top_nav_left">
+                                <a href="@WebShoeShop.Common.SettingHelper.GetValue("SettingFacebook")" title="Facebook">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="@WebShoeShop.Common.SettingHelper.GetValue("SettingFacebook")" title="Instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="@WebShoeShop.Common.SettingHelper.GetValue("SettingZalo")" title="Zalo">
+                                    <i class="fab fa-viber"></i>
+                                </a>
+                                <a href="@WebShoeShop.Common.SettingHelper.GetValue("SettingYoutube")" title="Youtube">
+                                    <i class="fab fa-youtube"></i>
+                                </a>
+                                Hotline: @SettingHelper.GetValue("SettingHotline")
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <div class="top_nav_right">
+                                <ul class="top_nav_menu">
+                                    <li class="account">
+                                        @if (!Request.IsAuthenticated)
+                                        {
+                                            <a href="#">
+                                                <i class="fa fa-user" aria-hidden="true"></i>
+                                                Tài khoản
+                                                <i class="fa fa-angle-down"></i>
+                                            </a>
+                                            <ul class="account_selection">
+                                                <li><a href="/account/login"><i class="fa fa-sign-in" aria-hidden="true"></i> Đăng nhập</a></li>
+                                                <li><a href="/account/Register"><i class="fa fa-user-plus" aria-hidden="true"></i> Đăng kí</a></li>
+                                            </ul>
+                                        }
+                                        else
+                                        {
+                                            <a href="#">
+                                                <i class="fa fa-user" aria-hidden="true"></i>
+                                                Welcome: @User.Identity.Name
+                                                <i class="fa fa-angle-down"></i>
+                                            </a>
+                                            <ul class="account_selection">
+                                                <li><a href="javascript:document.getElementById('logOffForm').submit()"><i class="fa fa-arrow-right" aria-hidden="true"></i> Đăng xuất</a></li>
+                                            </ul>
+                                        }
+                                    </li>
+                                </ul>
+
+                            </div>
+                            @if (Request.IsAuthenticated)
+                            {
+                                <div style="display:none">
+                                    @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { @id = "logOffForm" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Main Navigation -->
+            <div class="main_nav_container">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-right">
+                            <div class="logo_container">
+                                <a href="/">
+                                    <img src="~/Content/assets/images/logonew2.png" />
+                                </a>
+                            </div>
+                            <nav class="navbar">
+                                @Html.Action("MenuTop", "Menu")
+                                <ul class="navbar_user">
+                                    <li id="search_li">
+                                        @using (Html.BeginForm("index", "Search", FormMethod.Get, new { }))
+                                        {
+                                            <div class="input-group" style="margin: 10px 0;">
+                                                <input type="text" name="Searchtext" class="form-control" placeholder="Tìm kiếm sản phẩm" style="opacity: 0; pointer-events: none; transition: opacity 0.3s;">
+                                                <span class="input-group-append" style="cursor: pointer;">
+                                                    <a href="#" class="btn" style="border-radius: 50%;background-color: #eceff6; color: black; padding: 10px;">
+                                                        <i class="fa fa-search" title="Tìm kiếm"></i>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <script>
+                                                const searchInput = document.querySelector('input[name="Searchtext"]');
+                                                const searchButton = document.querySelector('.input-group-append');
+                                                searchButton.addEventListener('click', () => {
+                                                    searchInput.style.opacity = '1';
+                                                    searchInput.style.pointerEvents = 'auto';
+                                                    searchInput.focus();
+                                                });
+                                                searchInput.addEventListener('blur', () => {
+                                                    if (!searchInput.value) {
+                                                        searchInput.style.opacity = '0';
+                                                        searchInput.style.pointerEvents = 'none';
+                                                    }
+                                                });
+                                            </script>
+                                        }
+                                    </li>
+
+                                    <li class="checkout">
+                                        <a href="/gio-hang">
+                                            <i class="fa fa-shopping-bag" aria-hidden="true" title="Giỏ hàng"></i>
+                                            <span id="checkout_items" class="checkout_items">0</span>
+                                        </a>
+                                    </li>
+                                    <li class="checkout">
+                                        <a href="/WishList/index">
+                                            <i class="fa fa-heart" aria-hidden="true" title="Sản phẩm yêu thích"></i>
+                                        </a>
+                                    </li>
+                                    <li class="checkout">
+                                        @if (User.Identity.IsAuthenticated)
+                                        {
+                                        <a href="/Account/Profile">
+                                            <i class="fa fa-address-card" aria-hidden="true" title="Hồ sơ người dùng"></i>
+                                        </a>
+                                        }
+                                    </li>
+                                </ul>
+                                <div class="hamburger_container">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </header>
+
+
+        @RenderBody()
+
+        <footer id="footer">
+            <div class="container">
+                <div class="footer-cta pt-5 pb-5">
+                    <div class="row">
+
+                    </div>
+                </div>
+                <div class="footer-content pt-5 pb-5">
+                    <div class="row">
+                        <div class="col-xl-4 col-lg-4 mb-50">
+                            <div class="footer-widget">
+                                <div class="footer-logo">
+                                    <a href="/home"><img src="~/Content/assets/images/logoshop_visible.png" class="img-fluid" alt="logo"></a>
+                                </div>
+                                <div class="footer-text">
+                                    <p style="margin-bottom: 5px"><i class="fa fa-location-arrow"></i> Địa chỉ: @SettingHelper.GetValue("SettingAddress") </p>
+                                    <p style="margin-bottom: 5px"><i class="fa fa-phone"></i> Hotline: @SettingHelper.GetValue("SettingHotline")</p>
+                                    <p style="margin-bottom: 5px"><i class="fa fa-envelope-o"></i> Email: @SettingHelper.GetValue("SettingEmail")</p>
+                                </div>
+                                <div class="footer-social-icon">
+                                    <span>Theo dõi chúng tôi</span>
+                                    <a href="@WebShoeShop.Common.SettingHelper.GetValue("SettingFacebook")"><i class="fab fa-facebook-f facebook-bg" title="Facebook"></i></a>
+                                    <a href="@WebShoeShop.Common.SettingHelper.GetValue("SettingZalo")"><i class="fab fa-viber twitter-bg" title="Zalo"></i></a>
+                                    <a href="@WebShoeShop.Common.SettingHelper.GetValue("SettingYoutube")"><i class="fab fa-youtube google-bg" title="Youtube"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-md-6 mb-30">
+                            <div class="footer-widget">
+                                <div class="footer-widget-heading">
+                                    <h3>Useful Links</h3>
+                                </div>
+                                <ul>
+                                    <li><a href="/home" style="font-weight: bold;">Trang chủ</a></li>
+                                    <li><a href="/lien-he" style="font-weight: bold;">Về chúng tôi</a></li>
+                                    <li><a href="/lien-he" style="font-weight: bold;">Hỗ trợ</a></li>
+                                    <li><a href="/san-pham">Sản phẩm</a></li>
+                                    <li><a href="/tuyen-dung">Tuyển dụng</a></li>
+                                    <li><a href="/FAQs">FAQs</a></li>
+                                    <li><a href="/tin-tuc">Tin tức</a></li>
+                                    <li><a href="/nhuong-quyen">Nhượng quyền</a></li>
+                                    <li><a href="/chinh-sach">Chính sách</a></li>
+                                    <li><a href="/post/khuyen-mai">Khuyến mãi</a></li>
+                                    <li><a href="/home">Về 2T-2Q</a></li>
+                                    <li><a href="/bao-mat">Bảo mật</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-md-6 mb-50">
+                            @Html.Action("Partial_Subcrice", "Home")
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-6 col-lg-6 text-center text-lg-left">
+                            <div class="copyright-text">
+                                <p>Copyright &copy; 2022 Double 2T-2Q, All Right Reserved</p>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 d-none d-lg-block text-right">
+                            <div class="footer-menu">
+                                <ul>
+                                    <li><a href="/home">Trang chủ</a></li>
+                                    <li><a href="/chinh-sach">Điều khoản</a></li>
+                                    <li><a href="/bao-mat">Bảo mật</a></li>
+                                    <li><a href="/chinh-sach">Chính sách</a></li>
+                                    <li><a href="/lien-he">Liên hệ</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+
+    </div>
+
+    <button class="back-to-top" onclick="scrollToTop()">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+    <div id="overlay" class="overlay"></div>
+    @*@Scripts.Render("~/bundles/jquery")*@
+    <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/0.1.0-beta.2/libs/oversea/index.js"></script>
+    <script>
+        new CozeWebSDK.WebChatClient({
+            config: {
+                bot_id: '7375497034566713345',
+            },
+            componentProps: {
+                title: 'Coze',
+            },
+        });
+    </script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    <script src="~/Content/assets/styles/bootstrap4/popper.js"></script>
+    <script src="~/Content/assets/styles/bootstrap4/bootstrap.min.js"></script>
+    <script src="~/Content/assets/plugins/Isotope/isotope.pkgd.min.js"></script>
+    <script src="~/Content/assets/plugins/OwlCarousel2-2.2.1/owl.carousel.js"></script>
+    <script src="~/Content/assets/plugins/easing/easing.js"></script>
+    <script src="~/Content/assets/plugins/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+    <script src="~/Content/assets/js/custom.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Content/assets/js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
+    <script src="~/Scripts/jsShopping.js"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

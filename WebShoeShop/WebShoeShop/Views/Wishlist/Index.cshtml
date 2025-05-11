@@ -1,0 +1,135 @@
+﻿@model PagedList.PagedList<WebShoeShop.Models.EF.Wishlist>
+@using PagedList.Mvc;
+@using PagedList;
+@{
+    ViewBag.Title = "Index";
+}
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/main_styles.css">
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+
+<style>
+    .news_section_container {
+        margin-top: 180px;
+    }
+
+    .row-item-new {
+        margin-bottom: 20px;
+    }
+
+    .title-news {
+        font-size: 24px;
+        border-bottom: 1px solid;
+        padding: 15px 0;
+        margin-bottom: 25px;
+    }
+
+    .img-box img {
+        max-width: 210px;
+        max-height: 50px;
+    }
+</style>
+<div class="container news_section_container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="title-news">Sản phẩm yêu thích</h1>
+        </div>
+    </div>
+    @if (Model != null && Model.Any())
+    {
+        foreach (var item in Model)
+        {
+            var CheckImage = item.Product.ProductImage.FirstOrDefault(x => x.IsDefault);
+            var strImg = "";
+            if (CheckImage != null)
+            {
+                strImg = CheckImage.Image;
+            }
+            <div class="row row-item-new" id="wishlist-item-@item.ProductId">
+                <div class="col-md-3">
+                    <div class="img">
+                        <a href="" title="@item.Product.Title"><img src="@strImg" alt="@item.Product.Title" style="width:90px;height:90px;" /></a>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="content-box">
+                        <h5><a href="" title="@item.Product.Title">@item.Product.Title</a></h5>
+                        <div class="description-box">
+                            @item.Product.Description
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <a href="#" data-id="@item.ProductId" class="btn btn-danger btnDeletee">Xóa</a>
+                </div>
+            </div>
+        }
+        <div class="row">
+            <div class="col-6"></div>
+            <div class="col-6" style="text-align:right;">
+                @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+            </div>
+        </div>
+    }
+
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('body').on('click', '.btnDeletee', function (e) {
+                e.preventDefault();
+                var id = $(this).data("id");
+
+                Swal.fire({
+                    title: 'Bạn có chắc chắn?',
+                    text: "Sản phẩm này sẽ bị xóa khỏi danh sách yêu thích!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/wishlist/PostDeleteWishlist',
+                            type: 'POST',
+                            data: { ProductId: id },
+                            success: function (res) {
+                                if (res.Success) {
+                                    Swal.fire({
+                                        toast: true,
+                                        position: 'top-center',
+                                        icon: 'success',
+                                        title: res.Message,
+                                        showConfirmButton: false,
+                                        timer: 3000
+                                    });
+                                    $('#wishlist-item-' + id).remove();
+                                } else {
+                                    Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        icon: 'error',
+                                        title: res.Message,
+                                        showConfirmButton: false,
+                                        timer: 3000
+                                    });
+                                }
+                            },
+                            error: function () {
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'error',
+                                    title: 'Đã xảy ra lỗi. Vui lòng thử lại!',
+                                    showConfirmButton: false,
+                                    timer: 3000
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        });
+</script>
+    }

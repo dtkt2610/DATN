@@ -1,0 +1,84 @@
+﻿@model WebShoeShop.Models.EF.ReviewProduct
+
+<div class="add_review">
+    @using (Ajax.BeginForm("PostReview", "Review", new AjaxOptions
+    {
+        HttpMethod = "POST",
+        UpdateTargetId = "load_review",
+        OnSuccess = "OnSuccessRE",
+        OnFailure = "OnFailureRE",
+        OnBegin = "OnBeginRE"
+    }, new { @Id = "review_form" }))
+    {
+        <script>
+            function OnBeginRE() {
+                $('#review_submit').attr("disabled", "disabled");
+            }
+            function OnSuccessRE(res) {
+    if (res.Success) {
+        if (typeof res === 'string' && res.trim() !== '') {
+            $('#load_review').html(res);
+        }
+        $("#review_form")[0].reset();
+        location.reload();
+    } else {
+        if (res.ShowNotAuthorizedView) {
+            $.ajax({
+                url: '@Url.Action("_Review", "Review")',
+                type: 'GET',
+                data: { productId: @ViewBag.ProductId },
+                success: function (partialView) { 
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: res.Message,
+                        didClose: () => {
+                            location.reload();
+                        }
+                    });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Đã xảy ra lỗi khi kiểm tra quyền đánh giá.'
+                    });
+                }
+            });
+        } 
+    }
+}
+
+            function OnFailureRE() {
+                alert('Đã xảy ra lỗi khi gửi đánh giá.');
+            }
+        </script>
+
+        @Html.AntiForgeryToken()
+        <div>
+            <h1>Thêm đánh giá </h1>
+            @Html.TextBoxFor(x => x.FullName, new { @class = "form_input input_name", @placeholder = "Tên", @id = "review_name" })
+            @Html.ValidationMessageFor(x => x.FullName)
+            @Html.TextBoxFor(x => x.Email, new { @class = "form_input input_email", @placeholder = "Email", @id = "review_email" })
+            @Html.ValidationMessageFor(x => x.Email)
+            @Html.HiddenFor(x => x.UserName)
+            @Html.HiddenFor(x => x.ProductId, new { @Value = ViewBag.ProductId })
+            <input type="text" id="txtRate" name="Rate" value="4" style="visibility:hidden;" />
+        </div>
+        <div>
+            <h1>Đánh giá của bạn:</h1>
+            <ul class="user_star_rating">
+                <li><i class="fa fa-star" aria-hidden="true"></i></li>
+                <li><i class="fa fa-star" aria-hidden="true"></i></li>
+                <li><i class="fa fa-star" aria-hidden="true"></i></li>
+                <li><i class="fa fa-star" aria-hidden="true"></i></li>
+                <li><i class="fa fa-star-o" aria-hidden="true"></i></li>
+            </ul>
+            @Html.TextAreaFor(x => x.Content, new { @class = "input_review", @rows = "4", @placeholder = "Nội dung" })
+        </div>
+        <div class="form-group" id="load_send"></div>
+        <div class="text-left text-sm-left">
+            <button id="review_submit" type="submit" class="red_button review_submit_btn btn btn-success" value="Submit">Gửi</button>
+        </div>
+    }
+</div>

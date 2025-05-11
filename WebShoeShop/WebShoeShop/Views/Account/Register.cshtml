@@ -1,0 +1,99 @@
+﻿﻿@model WebShoeShop.Models.RegisterViewModel
+@using WebShoeShop.Models
+
+@{
+    ViewBag.Title = "Register";
+}
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/main_styles.css">
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/Login.css">
+
+<div class="container contact_container">
+    <div class="row">
+        <div class="col">
+
+            <!-- Breadcrumbs -->
+            <h1 class="text-center" style="margin-top:30px; color: #ffffff;">Đăng ký</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="root">
+            <div class="main">
+                <div class="container1 b-container">
+                    <form class="form1" action="@Url.Action("Register", "Account")" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <h2 class="form_title title">Đăng ký</h2>
+                        <span class="form__span">Nhập vào thông tin của bạn</span>
+
+                        @Html.TextBoxFor(m => m.FullName, new { @class = "form__input", id = "FullName", placeholder = "Tên đầy đủ" })
+                        @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
+
+                        @Html.TextBoxFor(m => m.UserName, new { @class = "form__input", id = "UserName", placeholder = "Tên đăng nhập" })
+                        @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form__input", id = "Email", placeholder = "Email" })
+                        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+
+                        <div class="form__password-container" style="position: relative;">
+                            <!-- Mật khẩu -->
+                            @Html.PasswordFor(m => m.Password, new { @class = "form__input", id = "Password", placeholder = "Mật khẩu", oncopy = "return false;" })
+                            <i id="eyeIconPassword" class="fas fa-eye-slash" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #888; cursor: pointer;" aria-hidden="true"></i>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+
+                        <!-- Xác nhận mật khẩu (Không có biểu tượng con mắt) -->
+                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form__input", id = "ConfirmPassword", placeholder = "Xác nhận mật khẩu" })
+                        @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+
+
+                        <!-- Nút Đăng ký -->
+                        <button type="submit" class="form__button button submit">Đăng ký</button>
+                    </form>
+
+                </div>
+                <div class="switch1">
+                    <div class="switch__circle"></div>
+                    <div class="switch__container">
+                        <h2 class="switch__title title">Chào mừng bạn tới với Double 2T-2Q !</h2>
+                        <p class="switch__description description">Đã có tài khoản?</p>
+                        <button class="switch__button button switch-btn" onclick="window.location.href='@Url.Action("Login", "Account")'">Đăng nhập</button>
+                        <p class="switch__description description" style="margin-top: 50px;">Hoặc đăng ký với</p>
+                        @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
+                    </div>
+                </div>
+            </div>
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="error-message">
+                    Đăng ký không thành công. Vui lòng kiểm tra lại thông tin đăng ký.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        // Ngăn sao chép nội dung trong trường mật khẩu
+        const passwordField = document.getElementById("Password");
+        passwordField.addEventListener("copy", function (e) {
+            e.preventDefault(); // Ngừng hành động sao chép
+            alert("Không thể sao chép nội dung mật khẩu.");
+        });
+
+        // Thêm sự kiện khi người dùng click vào biểu tượng con mắt cho mật khẩu
+        const eyeIconPassword = document.getElementById("eyeIconPassword");
+        eyeIconPassword.addEventListener("click", function () {
+            if (passwordField.type === "password") {
+                passwordField.type = "text"; // Hiển thị mật khẩu
+                eyeIconPassword.classList.remove("fa-eye"); // Thay đổi icon
+                eyeIconPassword.classList.add("fa-eye-slash"); // Đổi thành icon mắt bị gạch chéo
+            } else {
+                passwordField.type = "password"; // Ẩn mật khẩu
+                eyeIconPassword.classList.remove("fa-eye-slash"); // Thay đổi icon
+                eyeIconPassword.classList.add("fa-eye"); // Đổi thành icon mắt bình thường
+            }
+        });
+    </script>
+}

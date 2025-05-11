@@ -1,0 +1,188 @@
+﻿@model IEnumerable<WebShoeShop.Models.ShoppingCartItem>
+@using WebShoeShop.Common
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<table class="table">
+    <tr class="text-center">
+        <th>STT</th>
+        <th>Ảnh sản phẩm</th>
+        <th>Tên sản phẩm</th>
+        <th>Danh mục</th>
+        <th>Giá</th>
+
+        <th style="width:90px;">Số lượng</th>
+        <th style="width:90px;">Size</th>
+        <th>Thành tiền</th>
+        <th style="width:200px;">
+
+        </th>
+    </tr>
+    @if (Model != null && Model.Any())
+    {
+        var i = 0;
+        var tongtien = decimal.Zero;
+        foreach (var item in Model)
+        {
+            tongtien += item.TotalPrice;
+            <tr class="text-center" id="trow_@(item.ProductId)">
+                <td>@(i + 1)</td>
+                <td><img src="@item.ProductImg" width="60" /></td>
+                <td>
+                    <a href="/chi-tiet/@item.Alias-p@(item.ProductId)">
+                        @item.ProductName
+                    </a>
+                </td>
+                <td>@item.CategoryName</td>
+                <td>@Common.FormatNumber(item.Price, 0)</td>
+                <td>
+                    <input type="number" class="form-control quantity-input"
+                           data-id="@item.ProductId"
+                           data-original-value="@item.Quantity"
+                           data-size="@item.Size"
+                           value="@item.Quantity"
+                           min="1"
+                           pattern="[0-9]*" />
+                </td>
+                <td>
+                    @item.Size
+                    <button class="btn btn-link btnUpdateSize"
+                            data-id="@item.ProductId"
+                            data-size="@item.Size">
+                        Cập nhật size
+                    </button>
+                </td>
+                <td>@Common.FormatNumber(item.TotalPrice, 2)</td>
+                <td>
+                    <a href="#" data-id="@item.ProductId" data-size="@item.Size"
+                       class="btn btn-sm btn-danger btnDelete">Xóa</a>
+                    <a href="#" data-id="@item.ProductId" data-size="@item.Size"
+                       class="btn btn-sm btn-success btnUpdate" onclick="updateProduct(this)">Cập nhật</a>
+                </td>
+            </tr>
+
+            i++;
+        }
+        <tr>
+            <th colspan="7" class="text-right">Giảm giá:</th>
+            <th class="text-center text-danger">-@Common.FormatNumber(Model?.Sum(x => x.Discount) ?? 0, 0)</th>
+            <th></th>
+        </tr>
+        tongtien = tongtien - Model.Sum(x => x.Discount);
+        <tr>
+            <th colspan="7" class="text-right">Tổng thanh toán: </th>
+            <th class="text-center text-success">@Common.FormatNumber(tongtien, 0)</th>
+            <th></th>
+        </tr>
+
+    }
+    else
+    {
+        <tr>
+            <th colspan="7">Không có sản phẩm trong giỏ hàng!!</th>
+            <th>
+                <div class="text-left"><a href="/san-pham"><i class="fa fa-arrow-left" aria-hidden="true"></i>Quay về trang sản phẩm</a></div>
+            </th>
+        </tr>
+
+    }
+
+</table>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="form-inline">
+            <label for="couponCode" class="mr-2">Nhập mã giảm giá:</label>
+            <input type="text" id="couponCode" name="couponCode"
+                   value="@ViewBag.CouponCode"
+                   class="form-control form-control-sm" style="width: 150px;" />
+            <button id="applyCouponButton" class="btn btn-outline-primary btn-sm ml-2"
+                    onclick="applyCouponCode()">
+                Áp dụng
+            </button>
+        </div>
+        <span id="couponMessage" class="text-danger mt-1"></span>
+    </div>
+</div>
+<div id="alertMessage" class="alert alert-dismissible fade show col-md-4" role="alert" style="display:none;">
+    <span id="alertText"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<!-- Modal for selecting coupon -->
+<div class="modal fade" id="couponModal" tabindex="-1" aria-labelledby="couponModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="couponModalLabel">Chọn mã giảm giá</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="couponList" class="row">
+                    <!-- Coupons will be loaded dynamically here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Button to open the modal -->
+<button type="button" class="btn btn-outline-primary btn-sm ml-2" data-bs-toggle="modal" data-bs-target="#couponModal">
+    Chọn mã giảm giá
+</button>
+
+<!-- Modal UpdateSize -->
+<div class="modal fade" id="updateSizeModal" tabindex="-1" aria-labelledby="updateSizeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateSizeModalLabel">Cập nhật size</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Nội dung chi tiết sản phẩm -->
+                <div id="productDetailsContainer"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-app" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-dark btnSaveSize" disabled>Cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Update Size-->
+<script>
+    function showAlert(message, type = "success") {
+        const alertBox = $('#alertMessage');
+        const alertText = $('#alertText');
+        alertBox.removeClass('alert-success alert-danger alert-warning').addClass(`alert-${type}`);
+        alertText.text(message);
+        alertBox.fadeIn();
+        setTimeout(() => {
+            alertBox.fadeOut();
+        }, 1000);
+    }
+
+    function applyCouponCode() {
+        var couponCode = $('#couponCode').val();
+
+        $.ajax({
+            url: '/ShoppingCart/ApplyCouponCode',
+            type: 'POST',
+            data: { couponCode: couponCode },
+            success: function (response) {
+                if (response.success) {
+                    showAlert(response.message, "success");
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showAlert(response.message, "danger");
+                    setTimeout(() => location.reload(), 1000);
+                }
+            },
+            error: function () {
+                showAlert("Có lỗi xảy ra, vui lòng thử lại!", "danger");
+            }
+        });
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
