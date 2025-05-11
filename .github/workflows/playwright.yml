@@ -25,15 +25,30 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
 
-    - name: Start server in background
+    - name: Start .NET server in background
+      shell: powershell
       run: |
-        dotnet run --project ./WebShoeShop --urls=http://localhost:44390 &
-        sleep 10  # Thời gian chờ cho server khởi động
+        Start-Process "dotnet" "run --project ./WebShoeShop --urls=http://localhost:44390"
+        $maxAttempts = 30
+        $i = 0
+        do {
+          try {
+            $response = Invoke-WebRequest http://localhost:44390 -UseBasicParsing -TimeoutSec 2
+            if ($response.StatusCode -eq 200) {
+              Write-Output "Server is up!"
+              break
+            }
+          } catch {
+            Write-Output "Waiting for server..."
+            Start-Sleep -Seconds 1
+          }
+          $i++
+        } while ($i -lt $maxAttempts)
 
     - name: Run Playwright tests
       run: npx playwright test
       env:
-        BASE_URL: http://localhost:44390  # Đảm bảo Playwright sử dụng URL chính xác
+        BASE_URL: http://localhost:44390
 
     - name: Upload test report
       if: always()
