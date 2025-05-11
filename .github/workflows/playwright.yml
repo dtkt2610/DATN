@@ -1,72 +1,36 @@
-name: Khai Do
+name: Playwright Tests
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main]
   pull_request:
-    branches: [ main, master ]
+    branches: [main]
 
 jobs:
-  chau_tu:
-    timeout-minutes: 60
-    runs-on: windows-latest
+  test:
+    runs-on: ubuntu-latest
 
     steps:
-      # Checkout repository
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      # Install Visual Studio Build Tools with Web targets (fix missing WebApplication.targets)
-      - name: Install Visual Studio Build Tools with Web targets
-        run: |
-          choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Component.Web --add Microsoft.VisualStudio.ComponentGroup.Web --includeRecommended --includeOptional --passive --locale en-US"
-
-    
-
-      # Setup .NET SDK
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          dotnet-version: '9.0.203'
+          node-version: '18' # hoặc phiên bản bạn dùng
 
-      # Restore .NET dependencies
-      - name: Restore .NET dependencies
-        run: dotnet restore WebShoeShop/WebShoeShop.sln
-
-      # Build .NET app
-      - name: Build .NET app
-        run: dotnet build WebShoeShop/WebShoeShop.sln --configuration Release
-
-      # Run the web server
-      - name: Run web server
-        run: dotnet run --project WebShoeShop/WebShoeShop.sln --urls https://localhost:44390/ &
-        env:
-          ASPNETCORE_ENVIRONMENT: Development
-
-      # Wait for the app to be ready
-      - name: Wait for app to be ready
-        run: npx wait-on https://localhost:44390/
-
-      # Setup Node.js
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-
-      # Install dependencies for frontend
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
-      # Install Playwright Browsers
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      # Run Playwright tests
       - name: Run Playwright tests
-        run: HOMEPAGEURL=https://localhost:44390/ npx playwright test
+        run: npx playwright test
 
-      # Upload Playwright report
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+      - name: Upload Playwright test report
+        if: always()
+        uses: actions/upload-artifact@v3
         with:
           name: playwright-report
           path: playwright-report/
-          retention-days: 30
