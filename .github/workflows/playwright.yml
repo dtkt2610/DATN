@@ -12,45 +12,66 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      # Checkout repository
       - uses: actions/checkout@v4
 
-      # Cài Visual Studio Build Tools + Web targets (fix lỗi thiếu WebApplication.targets)
+      # Install Visual Studio Build Tools with Web targets (fix missing WebApplication.targets)
       - name: Install Visual Studio Build Tools with Web targets
         run: |
-          choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Component.Web --includeRecommended --includeOptional --passive --locale en-US"
+          choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Component.Web --add Microsoft.VisualStudio.ComponentGroup.Web --includeRecommended --includeOptional --passive --locale en-US"
 
+      # Verify if the required file exists
+      - name: Verify WebApplication.targets file
+        run: |
+          if (Test-Path "C:\Program Files\dotnet\sdk\9.0.203\Microsoft\VisualStudio\v17.0\WebApplications\Microsoft.WebApplication.targets") {
+            Write-Host "File exists."
+          } else {
+            Write-Host "File does not exist."
+            exit 1
+          }
+
+      # Setup .NET SDK
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.203'
 
+      # Restore .NET dependencies
       - name: Restore .NET dependencies
         run: dotnet restore WebShoeShop/WebShoeShop.sln
 
+      # Build .NET app
       - name: Build .NET app
         run: dotnet build WebShoeShop/WebShoeShop.sln --configuration Release
 
+      # Run the web server
       - name: Run web server
         run: dotnet run --project WebShoeShop/WebShoeShop.sln --urls https://localhost:44390/ &
         env:
           ASPNETCORE_ENVIRONMENT: Development
 
+      # Wait for the app to be ready
       - name: Wait for app to be ready
         run: npx wait-on https://localhost:44390/
 
+      # Setup Node.js
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
 
+      # Install dependencies for frontend
       - name: Install dependencies
         run: npm ci
 
+      # Install Playwright Browsers
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
+      # Run Playwright tests
       - name: Run Playwright tests
         run: HOMEPAGEURL=https://localhost:44390/ npx playwright test
 
+      # Upload Playwright report
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
