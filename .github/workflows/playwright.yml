@@ -27,7 +27,7 @@ jobs:
 
     - name: Start server in background
       run: |
-        dotnet run --project ./WebShoeShop --urls=https://localhost:44390 &
+        dotnet run --project ./WebShoeShop/WebShoeShop --urls=https://localhost:44390 &
         sleep 10  # Thời gian chờ cho server khởi động
 
     - name: Run Playwright tests
