@@ -29,7 +29,7 @@ jobs:
       shell: powershell
       run: |
         Start-Process "dotnet" "run --project ./WebShoeShop/WebShoeShop --urls=http://localhost:44390"
-        $maxAttempts = 30
+        $maxAttempts = 180
         $i = 0
         do {
           try {
