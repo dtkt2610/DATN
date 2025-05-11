@@ -28,7 +28,7 @@ jobs:
     - name: Start .NET server in background
       shell: powershell
       run: |
-        Start-Process "dotnet" "run --project ./WebShoeShop --urls=http://localhost:44390"
+        Start-Process "dotnet" "run --project ./WebShoeShop/WebShoeShop --urls=http://localhost:44390"
         $maxAttempts = 30
         $i = 0
         do {
