@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "yzX7V0x/l4Q=",
+  "dgSpecHash": "1VA9RjVz3To=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Lenovo\\Documents\\DATN\\Double2T_2Q\\WebShoeShop\\WebShoeShopUnitTest\\WebShoeShopUnitTest.csproj",
+  "projectFilePath": "C:\\Users\\Lenovo\\Documents\\DATN\\WebShoeShop\\WebShoeShopUnitTest\\WebShoeShopUnitTest.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Lenovo\\.nuget\\packages\\coverlet.collector\\6.0.0\\coverlet.collector.6.0.0.nupkg.sha512",
     "C:\\Users\\Lenovo\\.nuget\\packages\\microsoft.codecoverage\\17.6.0\\microsoft.codecoverage.17.6.0.nupkg.sha512",
