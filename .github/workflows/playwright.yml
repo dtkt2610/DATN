@@ -42,7 +42,7 @@ jobs:
 
         Write-Host "Using MSBuild path: $msbuildPath"
 
-        & "$msbuildPath" "WebShoeShop/WebShoeShop/WebShoeShop.csproj" /p:Configuration=Release /p:Platform="Any CPU"
+        & "$msbuildPath" "WebShoeShop/WebShoeShop/WebShoeShop.csproj" /p:Configuration=Debug /p:Platform="x86"
     
     - name: Start ASP.NET MVC app using IIS Express
       shell: powershell
