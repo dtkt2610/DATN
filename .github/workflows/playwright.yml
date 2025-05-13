@@ -1,4 +1,4 @@
-name: Playwright Tests for ASP.NET MVC (.NET Framework)
+name: Playwright Tests for ASP.NET MVC (.NET Framework) via Docker
 
 on:
   push:
@@ -25,44 +25,51 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
 
-    - name: Build ASP.NET MVC project (.NET Framework)
+    - name: Build and run Docker containers
+      run: docker-compose up -d --build
+
+    - name: Wait for web server (ASP.NET MVC) to be ready on HTTPS
       shell: powershell
       run: |
-        # Tìm đường dẫn MSBuild.exe bằng vswhere
-        $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-        if (-Not (Test-Path $vswhere)) {
-          throw "vswhere.exe not found."
+        # Bypass SSL cert validation
+        add-type @"
+        using System.Net;
+        using System.Security.Cryptography.X509Certificates;
+        public class TrustAllCertsPolicy : ICertificatePolicy {
+          public bool CheckValidationResult(
+            ServicePoint srvPoint, X509Certificate certificate,
+            WebRequest request, int certificateProblem) {
+            return true;
+          }
         }
+        "@
+        [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 
-        $msbuildPath = & "$vswhere" -latest -products * -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | Select-Object -First 1
+        $maxRetries = 10
+        $attempt = 0
+        do {
+          try {
+            $res = Invoke-WebRequest https://localhost:44390 -UseBasicParsing -TimeoutSec 5
+            if ($res.StatusCode -eq 200) {
+              Write-Host "✅ Web server is up!"
+              break
+            }
+          } catch {
+            Write-Host "⏳ Waiting for web server..."
+            Start-Sleep -Seconds 5
+            $attempt++
+          }
+        } while ($attempt -lt $maxRetries)
 
-        if (-Not (Test-Path $msbuildPath)) {
-          throw "MSBuild.exe not found via vswhere."
-        }
-
-        Write-Host "Using MSBuild path: $msbuildPath"
-
-        & "$msbuildPath" "WebShoeShop/WebShoeShop/WebShoeShop.csproj" /p:Configuration=Release /p:Platform="AnyCPU"
-    
-    - name: Start ASP.NET MVC app using IIS Express
-      shell: powershell
-      run: |
-        $iisExpressPath = "${env:ProgramFiles(x86)}\IIS Express\iisexpress.exe"
-        if (-not (Test-Path $iisExpressPath)) {
-          Write-Error "IIS Express không được cài đặt trên runner."
+        if ($attempt -eq $maxRetries) {
+          Write-Error "❌ Web server did not start in time."
           exit 1
         }
-
-        Start-Process -FilePath $iisExpressPath `
-                      -ArgumentList "/path:$PWD\WebShoeShop", "/port:44390" `
-                      -NoNewWindow
-        Write-Host "Waiting for server to start..."
-        Start-Sleep -Seconds 15
 
     - name: Run Playwright tests
       run: npx playwright test
       env:
-        BASE_URL: http://localhost:44390
+        BASE_URL: https://localhost:44390
 
     - name: Upload test report
       if: always()
