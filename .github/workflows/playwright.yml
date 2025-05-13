@@ -1,4 +1,4 @@
-name: Playwright Tests
+name: Playwright Tests for ASP.NET MVC (.NET Framework)
 
 on:
   push:
@@ -25,25 +25,16 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
 
-    - name: Start .NET server in background
-      shell: powershell
+    - name: Build ASP.NET MVC project (.NET Framework)
       run: |
-        Start-Process "dotnet" "run --project ./WebShoeShop/WebShoeShop --urls=http://localhost:44390"
-        $maxAttempts = 2
-        $i = 0
-        do {
-          try {
-            $response = Invoke-WebRequest http://localhost:44390 -UseBasicParsing -TimeoutSec 2
-            if ($response.StatusCode -eq 200) {
-              Write-Output "Server is up!"
-              break
-            }
-          } catch {
-            Write-Output "Waiting for server..."
-            Start-Sleep -Seconds 180
-          }
-          $i++
-        } while ($i -lt $maxAttempts)
+        msbuild WebShoeShop/WebShoeShop.csproj /p:Configuration=Release /p:Platform="Any CPU"
+      shell: cmd
+
+    - name: Start ASP.NET MVC app using IIS Express
+      run: |
+        IISExpress.exe /path:"$(pwd)\WebShoeShop" /port:44390 &
+        Start-Sleep -Seconds 15
+      shell: powershell
 
     - name: Run Playwright tests
       run: npx playwright test
