@@ -28,12 +28,22 @@ jobs:
     - name: Build ASP.NET MVC project (.NET Framework)
       shell: powershell
       run: |
-        $msbuildPath = "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe"
-        if (-Not (Test-Path $msbuildPath)) {
-          throw "MSBuild.exe not found at expected location: $msbuildPath"
+        # Tìm đường dẫn MSBuild.exe bằng vswhere
+        $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+        if (-Not (Test-Path $vswhere)) {
+          throw "vswhere.exe not found."
         }
-        & "$msbuildPath" "WebShoeShop/WebShoeShop.csproj" /p:Configuration=Release /p:Platform="Any CPU"
 
+        $msbuildPath = & "$vswhere" -latest -products * -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | Select-Object -First 1
+
+        if (-Not (Test-Path $msbuildPath)) {
+          throw "MSBuild.exe not found via vswhere."
+        }
+
+        Write-Host "Using MSBuild path: $msbuildPath"
+
+        & "$msbuildPath" "WebShoeShop/WebShoeShop.csproj" /p:Configuration=Release /p:Platform="Any CPU"
+    
     - name: Start ASP.NET MVC app using IIS Express
       shell: powershell
       run: |
