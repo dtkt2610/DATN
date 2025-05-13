@@ -26,15 +26,28 @@ jobs:
       run: npx playwright install --with-deps
 
     - name: Build ASP.NET MVC project (.NET Framework)
+      shell: powershell
       run: |
-        msbuild WebShoeShop/WebShoeShop.csproj /p:Configuration=Release /p:Platform="Any CPU"
-      shell: cmd
+        $msbuildPath = "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe"
+        if (-Not (Test-Path $msbuildPath)) {
+          throw "MSBuild.exe not found at expected location: $msbuildPath"
+        }
+        & "$msbuildPath" "WebShoeShop/WebShoeShop.csproj" /p:Configuration=Release /p:Platform="Any CPU"
 
     - name: Start ASP.NET MVC app using IIS Express
-      run: |
-        IISExpress.exe /path:"$(pwd)\WebShoeShop" /port:44390 &
-        Start-Sleep -Seconds 15
       shell: powershell
+      run: |
+        $iisExpressPath = "${env:ProgramFiles(x86)}\IIS Express\iisexpress.exe"
+        if (-not (Test-Path $iisExpressPath)) {
+          Write-Error "IIS Express không được cài đặt trên runner."
+          exit 1
+        }
+
+        Start-Process -FilePath $iisExpressPath `
+                      -ArgumentList "/path:$PWD\WebShoeShop", "/port:44390" `
+                      -NoNewWindow
+        Write-Host "Waiting for server to start..."
+        Start-Sleep -Seconds 15
 
     - name: Run Playwright tests
       run: npx playwright test
